@@ -4,10 +4,9 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-
 import java.io.IOException;
-
 import static io.restassured.RestAssured.given;
+import static tests.BaseTest.DELETE_USER_PATH;
 
 public class BaseRequests {
     /**
@@ -36,10 +35,10 @@ public class BaseRequests {
      *
      * @param userId id сущности, которую необходимо удалить
      */
-    public static void deleteUserById(String userId) {
+    public static void deleteUserById(Integer userId) {
         given()
                 .when()
-                .delete(" /api/delete/" + userId)
+                .delete(DELETE_USER_PATH + userId)
                 .then()
                 .statusCode(204);
     }

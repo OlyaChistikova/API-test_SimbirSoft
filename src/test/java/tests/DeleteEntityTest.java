@@ -1,51 +1,89 @@
 package tests;
 
 import io.restassured.response.Response;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
+import pojo.Addition;
+import pojo.Entity;
 import static io.restassured.RestAssured.given;
+import io.qameta.allure.Step;
 
+/**
+ * Тесты для проверки удаления сущностей.
+ */
+public class DeleteEntityTest extends BaseTest {
 
-public class DeleteEntityTest extends BaseTest{
+    /**
+     * Подготовка тестовой сущности для проверки её удаления.
+     */
+    @BeforeMethod
+    @Step("Create an entity for deletion test")
+    public void testToCreateEntityForDeleteEntityById() {
+        // Создаем объект Entity для проверки его удаления
+        createEntity = Entity.builder()
+                .id(null)
+                .addition(Addition.builder()
+                        .additional_info("Будет удалена")
+                        .additional_number(123)
+                        .build())
+                .importantNumbers("456, 789")
+                .title("Удаляемая сущность")
+                .verified(true)
+                .build();
 
-    @Test
-    public void testDeleteEntityById() throws IOException {
-
-        String jsonBody = new String(Files.readAllBytes(Paths.get("src/test/resources/json/userDeleteBody.json")));
-        //Создание новой и получение entityId
-        Response createEntity = given()
+        // Добавляем новую сущность
+        Response createResponse = given()
+                .spec(requestSpecification)
                 .contentType("application/json")
-                .body(jsonBody)
+                .body(createEntity)
                 .when()
-                .post("/api/create")
+                .post(CREATE_USER_PATH)
                 .then()
                 .statusCode(200)
-                .log().all()
                 .extract().response();
 
-        //Получение entityId
-        String entityId = createEntity.asString();
+        // Получаем ID созданной сущности для проверки ее успешного удаления
+        entityId = Integer.valueOf(createResponse.asString());
+    }
 
-        //Удаляем, созданную сущность по id
+    /**
+     * Тест, который проверяет удаление сущности по ID.
+     */
+    @Test
+    @Step("Test delete entity by ID")
+    public void testDeleteEntityById() {
+        // Удаляем созданную сущность по ID
+        deleteEntityById(entityId);
+
+        // Проверка, что сущность была удалена
+        verifyEntityDeleted(entityId);
+    }
+
+    /**
+     * Удаляет сущность по указанному ID.
+     *
+     * @param entityId ID сущности для удаления.
+     */
+    @Step("Delete entity by ID: {entityId}")
+    private void deleteEntityById(Integer entityId) {
         given()
                 .when()
-                .log().all()
-                .delete("/api/delete/" + entityId)
+                .delete(DELETE_USER_PATH + entityId)
                 .then()
-                .log().all()
                 .statusCode(204);
+    }
 
-        //Проверка, что сущность была удалена
+    /**
+     * Проверяет, что сущность удалена, проверяя ответ по ее ID.
+     *
+     * @param entityId ID сущности для проверки.
+     */
+    @Step("Verify that entity with ID {entityId} is deleted")
+    private void verifyEntityDeleted(Integer entityId) {
         given()
                 .when()
-                .get("/api/get/" + entityId)
+                .get(GET_USER_PATH + entityId)
                 .then()
-                .log().all()
                 .statusCode(500);
-
     }
 }

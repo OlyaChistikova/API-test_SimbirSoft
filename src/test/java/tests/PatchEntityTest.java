@@ -1,49 +1,76 @@
 package tests;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.response.Response;
-import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Objects;
-
+import pojo.Addition;
+import pojo.Entity;
+import io.qameta.allure.Step;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class PatchEntityTest {
+/**
+ * Тесты для обновления сущностей через PATCH запрос.
+ */
+public class PatchEntityTest extends BaseTest {
 
+    private Entity createEntity;
+    private int entityId;
 
-    @Test
-    public void patchRequest() throws IOException {
-        // Загрузка Json тела для обновления сущности
-       String jsonBody = new String(Files.readAllBytes(Paths.get("src/test/resources/json/entityPatchBody.json")));
+    @BeforeMethod
+    @Step("Create entity before updating")
+    public void createEntityBeforeUpdateEntity() {
+        // Создаем объект Entity
+        createEntity = Entity.builder()
+                .id(4)
+                .addition(Addition.builder()
+                        .additional_info("Обновленные сведения")
+                        .additional_number(123)
+                        .build())
+                .importantNumbers("456, 789")
+                .title("Обновленная сущность")
+                .verified(true)
+                .build();
 
-        //Извлечение Id и других данных из Json
-        Map<String, Object> entityData = new ObjectMapper().readValue(jsonBody, Map.class);
-       String entityId = (String) entityData.get("id") ;
+        //Получение id сущности
+        entityId = createEntity.getId();
 
+        //Проверяем на существование сущности с заданным id
         given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(jsonBody)
+                .spec(requestSpecification)
+                .contentType("application/json")
+                .body(createEntity)
                 .when()
-                .patch("/api/patch/" + entityId)
+                .get(GET_USER_PATH + entityId)
+                .then()
+                .statusCode(200)
+                .extract().response();
+    }
+
+    /**
+     * Тест для обновления сущности по ID.
+     */
+    @Test
+    @Step("Patch entity by ID")
+    public void testPatchEntityById() {
+        // Обновляем данные сущности с заданным id
+        given()
+                .spec(requestSpecification)
+                .header("Content-type", "application/json")
+                .body(createEntity)
+                .when()
+                .patch(PATCH_USER_PATH + entityId)
                 .then()
                 .statusCode(204)
                 .extract().response();
 
-        //Проверка на обновление данных сущности
+        // Проверяем обновление данных сущности
         given()
+                .spec(requestSpecification)
                 .when()
-                .get("/api/get/" + entityId)
+                .get(GET_USER_PATH + entityId)
                 .then()
                 .statusCode(200)
-                .body("title", equalTo("Обновлённая сущность"))
-                .body("id", equalTo(46));
-
+                .body("title", equalTo("Обновленная сущность"))
+                .body("id", equalTo(entityId));
     }
 }
