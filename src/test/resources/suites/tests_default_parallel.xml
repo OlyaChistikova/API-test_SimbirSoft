@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="autotest" verbose = "1" parallel="classes" thread-count="6">
+
+    <test name="Tests">
+        <classes>
+            <class name="tests.CreateEntityTest"/>
+            <class name="tests.DeleteEntityTest"/>
+            <class name="tests.GetAllEntitiesTest"/>
+            <class name="tests.GetEntityTest"/>
+            <class name="tests.PatchEntityTest"/>
+        </classes>
+    </test>
+</suite>
