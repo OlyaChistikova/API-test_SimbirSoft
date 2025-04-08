@@ -7,8 +7,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import pojo.Addition;
-import pojo.Entity;
 import io.qameta.allure.Step;
+import pojo.Entity;
+
 import java.util.ArrayList;
 import java.util.List;
 import static io.restassured.RestAssured.given;

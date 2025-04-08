@@ -6,6 +6,7 @@ import io.restassured.specification.RequestSpecification;
 import io.qameta.allure.Step;
 import org.testng.annotations.BeforeClass;
 import pojo.Entity;
+
 import java.io.IOException;
 import static org.testng.Assert.assertNotNull;
 

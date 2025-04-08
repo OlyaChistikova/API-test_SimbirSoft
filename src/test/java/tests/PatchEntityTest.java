@@ -3,8 +3,9 @@ package tests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pojo.Addition;
-import pojo.Entity;
 import io.qameta.allure.Step;
+import pojo.Entity;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 

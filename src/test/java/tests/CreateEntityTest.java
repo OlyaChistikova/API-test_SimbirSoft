@@ -6,10 +6,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import io.restassured.response.Response;
 import pojo.Addition;
-import pojo.Entity;
+
 import java.io.IOException;
 import static io.restassured.RestAssured.given;
 import io.qameta.allure.Step;
+import pojo.Entity;
 
 /**
  * Тесты для проверки создания сущностей.
